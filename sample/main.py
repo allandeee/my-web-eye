@@ -1,17 +1,10 @@
 #! /usr/bin/python3
 
-import requests
-from bs4 import BeautifulSoup
-from pprint import pprint
+from site_checker import DCGBChecker
 
-URL = 'https://dailyclack.com/collections/group-buys'
-page = requests.get(URL)
+dc_checker = DCGBChecker()
 
-soup = BeautifulSoup(page.content, 'html.parser')
-
-results = soup.find_all('div', class_='product-card__info')
-
-for r in results[:4]:
+for r in dc_checker.get_latest_content():
     item_name = r.find('div', class_='product-card__name')
     item_availability = r.find('div', class_='product-card__availability')
     item_price = r.find('div', class_='product-card__price')
