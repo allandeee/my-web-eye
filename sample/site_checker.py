@@ -28,3 +28,17 @@ class DCGBChecker(SiteChecker):
         results = soup.find_all('div', class_='product-card__info')
 
         return results[:5]
+
+    def get_latest_content_items(self):
+        result = []
+        for r in self.get_latest_content():
+            item_name = r.find('div', class_='product-card__name')
+            item_availability = r.find(
+                'div', class_='product-card__availability')
+            item_price = r.find('div', class_='product-card__price')
+            print(item_name.text)
+            if item_price and not item_availability:
+                result.append((item_name.text, item_price.text.strip()))
+            elif item_availability:
+                result.append((item_name.text, item_availability.text.strip()))
+        return result

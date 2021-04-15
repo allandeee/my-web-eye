@@ -48,6 +48,6 @@ class TestDCGBChecker(unittest.TestCase):
             5
         )
 
-    @unittest.mock
+
 if __name__ == '__main__':
     unittest.main()
