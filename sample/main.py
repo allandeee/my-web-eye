@@ -2,4 +2,7 @@
 
 from web_eye import WebEye
 
-WebEye.continuous_reader(secs=5)
+web_eye = WebEye(secs=5)
+web_eye.continuous_reader()
+
+# WebEye._checker()
