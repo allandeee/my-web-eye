@@ -11,6 +11,7 @@ class WebEye(object):
         self.dc_checker = DCGBChecker()
         self.seven_v = DCSevenVChecker()
         self.scheduler = sched.scheduler(time.time, time.sleep)
+        self.found = False
 
     def _get_time_str(self):
         t = time.localtime()
@@ -23,18 +24,25 @@ class WebEye(object):
         self.seven_v.print_content()
         print('===')
 
-    def reader(self, secs):
+    def reader(self):
         self._reader()
-        self.scheduler.enter(secs, 1, self.reader, (secs,))
+        self.scheduler.enter(self.secs, 1, self.reader)
 
     def continuous_reader(self):
-        self.scheduler.enter(0, 1, self.reader, (self.secs,))
+        self.scheduler.enter(0, 1, self.reader, ())
         self.scheduler.run()
 
-    @classmethod
-    def _checker(cls):
-        if cls.seven_v.get_item_availability().lower() == 'sold out':
-            webbrowser.open(cls.seven_v.url)
+    def _checker(self):
+        if not self.found and self.seven_v.get_item_availability().lower() == 'available':
+            webbrowser.open(self.seven_v.url, new=2)
+            self.found = True
 
-    def checker(cls):
-        pass
+    def checker(self):
+        self._checker()
+        event = self.scheduler.enter(self.secs, 1, self.checker)
+        if self.found:
+            self.scheduler.cancel(event)
+
+    def continuous_checker(self):
+        self.scheduler.enter(0, 1, self.checker)
+        self.scheduler.run()
