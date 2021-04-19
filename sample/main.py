@@ -1,13 +1,9 @@
 #! /usr/bin/python3
 
-from site_checker import DCGBChecker, DCSevenVChecker
+from web_eye import WebEye
 
-dc_checker = DCGBChecker()
-dc_checker.print_content()
+web_eye = WebEye(secs=5)
 
-print('===')
+# web_eye.continuous_reader()
 
-seven_v = DCSevenVChecker()
-seven_v.print_content()
-
-print('===')
+web_eye.continuous_checker()
