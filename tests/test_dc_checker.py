@@ -1,6 +1,7 @@
 import requests
 import unittest
-from unittest.mock import Mock, patch
+from bs4 import BeautifulSoup
+from unittest.mock import call, Mock, patch
 from sample.site_checker import (
     SiteChecker, DCGBChecker, DCItemChecker
 )
@@ -51,6 +52,22 @@ class TestDCGBChecker(unittest.TestCase):
             5
         )
 
+    @patch.object(
+        DCGBChecker, 'get_latest_content_items',
+        return_value=[('[GB] Mock item', 'From $10000 AUD')]
+    )
+    @patch('builtins.print')
+    def test_print_content_title(self, mock_print, *args):
+        dc_checker = DCGBChecker()
+        dc_checker.print_content()
+        mock_print.assert_has_calls(
+            [
+                call('DailyClack Groupbuy Check'),
+                call([('[GB] Mock item', 'From $10000 AUD')])
+            ],
+            any_order=True
+        )
+
 
 class TestDCItemChecker(unittest.TestCase):
 
@@ -95,6 +112,39 @@ class TestDCItemChecker(unittest.TestCase):
         item_checker = DCItemChecker()
         with self.assertRaises(ItemContentError):
             item_checker.get_latest_content_items()
+
+    @patch.object(
+        DCItemChecker, 'get_latest_content_items',
+        return_value={'title': '[GB] Mock title', 'price': '$1.00 AUD',
+                      'availability': 'Sold Out'}
+    )
+    @patch('builtins.print')
+    def test_print_content_title(self, mock_print, *args):
+        item_checker = DCItemChecker()
+        item_checker.print_content()
+        mock_print.assert_has_calls(
+            [
+                call('DailyClack 7V Check'),
+                call(
+                    {'title': '[GB] Mock title', 'price': '$1.00 AUD',
+                     'availability': 'Sold Out'}
+                )
+            ],
+            any_order=True
+        )
+
+    @patch.object(
+        BeautifulSoup, 'find'
+    )
+    def test_get_item_availability_sold_out(self, mock_find):
+        item_checker = DCItemChecker()
+        mock_find.return_value = Mock(
+            find=lambda *a, **kw: Mock(text='Sold Out')
+        )
+        self.assertEqual(
+            item_checker.get_item_availability(),
+            'Sold Out'
+        )
 
 
 if __name__ == '__main__':

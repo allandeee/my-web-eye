@@ -75,7 +75,7 @@ class DCItemChecker(SiteChecker):
         button = soup.find('div', class_='product-form__item--submit')
         avail = button.find(
             'span', {'id': 'AddToCartText-product-template'}
-        ).text
+        ).text.strip()
         if avail.lower() != 'sold out':
             return 'Available'
         return avail
@@ -94,7 +94,6 @@ class DCItemChecker(SiteChecker):
                 'price': item_price,
                 'availability': self.get_item_availability()
             }
-            return item_title.text, item_price.text.strip()
         raise ItemContentError()
 
 
